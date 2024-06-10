@@ -1,0 +1,10 @@
+Package: CrimeAnalyzer
+Title: Toolkit for Performing Repeatable Analyses on Crime Incident Data
+Version: 1.0.1
+Date: 4/29/2024
+Author: Simon G. Kolbeck
+Maintainer: Simon Kolbeck <sgkolbeck@gmail.com>
+RoxygenNote: 7.3.1
+Description: Provides a set of functions that make it easier to analyze crime incident reports
+Encoding: UTF-8
+

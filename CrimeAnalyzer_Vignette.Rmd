@@ -1,0 +1,152 @@
+---
+title: "Using the CrimeAnalyzer Package"
+author: "simon Kolbeck"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Using the CrimeAnalyzer Package}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  knitr::opts_chunk$set(warning = FALSE, message = FALSE)
+)
+```
+
+
+
+```{r package,include=FALSE}
+
+require(tidyverse)
+require(CrimeAnalyzer)
+
+```
+
+
+## Introduction
+
+
+The `CrimeAnalyzer` package includes a number of useful functions that streamline the process of analyzing crime report data. Crime report data typically consists of geo-coded and time-stamped crime incidents. These data are often untidy and difficult to process. Moreover, when analyzing crime trend data, one often repeats the same procedure for different crime trends. `CrimeAnalyzer` provides functions for these repeatable actions in order to reduce the need for copying and pasting code. 
+
+
+The core functions of the package include: `clean_crime_reports()`,`distribution_bar()`,`plot_timetrend()`,`plot_its`, `FC_Crime_map()`,`get_key_census_metric()`, `merge_data()`
+
+The functions in `CrimeAnalyzer` are demonstrated using a simulated data that is is structured as follows:
+
+```{r sim_data, echo = FALSE,}
+# Set the seed for reproducibility
+set.seed(123)
+
+# Function to generate random dates
+random_dates <- function(n, start_date, end_date) {
+  start_date <- as.Date(start_date)
+  end_date <- as.Date(end_date)
+  date_seq <- seq.Date(start_date, end_date, by = "day")
+  sample(date_seq, n, replace = TRUE)
+}
+
+# Number of rows
+n <- 500
+
+# Generate random dates between 2020 and 2024
+dates <- random_dates(n, "2020-01-01", "2024-12-31")
+
+# Define types of crimes
+crime_types <- c("Assault", "Robbery", "Homicide", "Burglary", "Drug Possession", "Drug Trafficking")
+
+# Generate random crime types
+crime_sample <- sample(crime_types, n, replace = TRUE)
+
+# Create the dataframe
+crime_incident_data <- data.frame(
+  date = dates,
+  crime_type = crime_sample
+)
+
+knitr::kable(head(crime_incident_data))
+
+```
+
+
+## Plotting Crime Incident Distribution
+
+The `distribution_bar()` function is a useful tool for exploring the distribution of crime types in a dataset.
+
+The code below demonstrates a use case for `distribution_bar()`. The function produces a bar chart of crime types in the `crime_type` variable.
+
+```{r,include = TRUE,fig.width=6, fig.height=4, fig.fullwidth=TRUE,fig.align='center'}
+
+distribution_bar(data = crime_incident_data,
+                 variable = "crime_type",
+                 value = "percent")
+
+```
+
+
+## Cleaning Crime Incident Data
+
+The clean_crime_reports function transforms raw incident data into time series data. leveraging `group_by()` the function produces aggregate counts of crime types over time and within geographies (if desired).
+
+The example below demonstrates a use case for the `clean_crime_reports()` function. The sample data is randomly generated incident-based crime data consisting of a `date` column and a `crime_type` column. The date variable is generated with lubridate and takes the form of a POSIXct. The function performs best if the provided date column is already in a standard date format. But internal parsing can extract the date if the correct date format is supplied.
+
+
+The following code demonstrates how the `clean_crime_reports()` restructures the data:
+
+```{r}
+cleaned_incident_data <- clean_crime_reports(data = crime_incident_data,
+                                             crime_var = "crime_type",
+                                             date_var = "date",
+                                             date_format = "%Y-%m-%d",
+                                             time_period = "year_quarter",
+                                             geography = NULL)
+
+
+```
+
+
+```{r, include = FALSE}
+knitr::kable(head(cleaned_incident_data,10))
+```
+
+## Plotting Time Trends
+
+The `plot_timetrend()` function leverages `ggplot()` to produce a line graph of an indicator over time. 
+
+Take the following example using the `cleaned_incident_data` where the count of assaults are plotted by quarter. The plot produced with `plot_timetrend()` is of class "ggplot" and can be easily modified as needed. 
+
+```{r, include = TRUE,fig.width=6, fig.height=4, fig.fullwidth=TRUE,fig.align='center'}
+plot_timetrend(data = cleaned_incident_data,
+               y_var = "assault_count",
+               time_indicator = "year_quarter",
+               smoothing_method = "loess",
+               xlab = "Quarter",
+               ylab = "Assaults")
+```
+
+## Getting Census Measures
+
+Analyzing crime incident data often requires census data, such as the population, racial composition, and socioeconomic condition of a geographic area. The `get_key_census_metric` produces a data frame of several census measures. The function allows the user to specify the time frame and the geographies for which census measures are to be extracted. 
+
+```{r, include = TRUE}
+#Replace with user-specific API key
+Sys.setenv(CENSUS_KEY='7c5c78e3abeb391dd9e2f432b6f74c8b949c0066')
+
+census_data <- get_key_census_metric(geo_level = "tract",
+                                     state = "OH",
+                                     counties = "Franklin",
+                                     year = 2020,
+                                     surv = "acs5")
+
+
+```
+
+The data frame produced by `get_key_census_metric` is structured as follows. The first column contains the census code corresponding to the chosen geographic unit. The second column contains the name of the specific geographic unit. Subsequent columns contain various census metrics, starting with total population, followed by total households and household poverty.  
+
+```{r, echo= FALSE}
+knitr::kable(head(census_data[ ,1:6],10))
+```
+

@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+<meta name="author" content="simon Kolbeck" />
+
+<meta name="date" content="2024-06-10" />
+
+<title>Using the CrimeAnalyzer Package</title>
+
+<script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
+// be compatible with the behavior of Pandoc < 2.8).
+document.addEventListener('DOMContentLoaded', function(e) {
+  var hs = document.querySelectorAll("div.section[class*='level'] > :first-child");
+  var i, h, a;
+  for (i = 0; i < hs.length; i++) {
+    h = hs[i];
+    if (!/^h[1-6]$/i.test(h.tagName)) continue;  // it should be a header h1-h6
+    a = h.attributes;
+    while (a.length > 0) h.removeAttribute(a[0].name);
+  }
+});
+</script>
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+
+
+<style type="text/css">
+  code {
+    white-space: pre;
+  }
+  .sourceCode {
+    overflow: visible;
+  }
+</style>
+<style type="text/css" data-origin="pandoc">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    var j = 0;
+    while (j < rules.length) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") {
+        j++;
+        continue;
+      }
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') {
+        j++;
+        continue;
+      }
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+
+
+
+
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
+}
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 16px;
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
+}
+pre {
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
+}
+pre:not([class]) {
+background-color: #f7f7f7;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
+}
+p > code, li > code {
+padding: 2px 0px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
+}
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
+</style>
+
+
+
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">Using the CrimeAnalyzer Package</h1>
+<h4 class="author">simon Kolbeck</h4>
+<h4 class="date">2024-06-10</h4>
+
+
+
+<div id="introduction" class="section level2">
+<h2>Introduction</h2>
+<p>The <code>CrimeAnalyzer</code> package includes a number of useful
+functions that streamline the process of analyzing crime report data.
+Crime report data typically consists of geo-coded and time-stamped crime
+incidents. These data are often untidy and difficult to process.
+Moreover, when analyzing crime trend data, one often repeats the same
+procedure for different crime trends. <code>CrimeAnalyzer</code>
+provides functions for these repeatable actions in order to reduce the
+need for copying and pasting code.</p>
+<p>The core functions of the package include:
+<code>clean_crime_reports()</code>,<code>distribution_bar()</code>,<code>plot_timetrend()</code>,<code>plot_its</code>,
+<code>FC_Crime_map()</code>,<code>get_key_census_metric()</code>,
+<code>merge_data()</code></p>
+<p>The functions in <code>CrimeAnalyzer</code> are demonstrated using a
+simulated data that is is structured as follows:</p>
+<table>
+<thead>
+<tr class="header">
+<th align="left">date</th>
+<th align="left">crime_type</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">2021-02-18</td>
+<td align="left">Burglary</td>
+</tr>
+<tr class="even">
+<td align="left">2021-04-07</td>
+<td align="left">Robbery</td>
+</tr>
+<tr class="odd">
+<td align="left">2020-06-27</td>
+<td align="left">Assault</td>
+</tr>
+<tr class="even">
+<td align="left">2021-06-09</td>
+<td align="left">Drug Trafficking</td>
+</tr>
+<tr class="odd">
+<td align="left">2020-07-13</td>
+<td align="left">Homicide</td>
+</tr>
+<tr class="even">
+<td align="left">2022-07-26</td>
+<td align="left">Burglary</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="plotting-crime-incident-distribution" class="section level2">
+<h2>Plotting Crime Incident Distribution</h2>
+<p>The <code>distribution_bar()</code> function is a useful tool for
+exploring the distribution of crime types in a dataset.</p>
+<p>The code below demonstrates a use case for
+<code>distribution_bar()</code>. The function produces a bar chart of
+crime types in the <code>crime_type</code> variable.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">distribution_bar</span>(<span class="at">data =</span> crime_incident_data,</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>                 <span class="at">variable =</span> <span class="st">&quot;crime_type&quot;</span>,</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>                 <span class="at">value =</span> <span class="st">&quot;percent&quot;</span>)</span></code></pre></div>
+<p><img src="data:image/png;base64,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" style="display: block; margin: auto;" /></p>
+</div>
+<div id="cleaning-crime-incident-data" class="section level2">
+<h2>Cleaning Crime Incident Data</h2>
+<p>The clean_crime_reports function transforms raw incident data into
+time series data. leveraging <code>group_by()</code> the function
+produces aggregate counts of crime types over time and within
+geographies (if desired).</p>
+<p>The example below demonstrates a use case for the
+<code>clean_crime_reports()</code> function. The sample data is randomly
+generated incident-based crime data consisting of a <code>date</code>
+column and a <code>crime_type</code> column. The date variable is
+generated with lubridate and takes the form of a POSIXct. The function
+performs best if the provided date column is already in a standard date
+format. But internal parsing can extract the date if the correct date
+format is supplied.</p>
+<p>The following code demonstrates how the
+<code>clean_crime_reports()</code> restructures the data:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>cleaned_incident_data <span class="ot">&lt;-</span> <span class="fu">clean_crime_reports</span>(<span class="at">data =</span> crime_incident_data,</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>                                             <span class="at">crime_var =</span> <span class="st">&quot;crime_type&quot;</span>,</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>                                             <span class="at">date_var =</span> <span class="st">&quot;date&quot;</span>,</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>                                             <span class="at">date_format =</span> <span class="st">&quot;%Y-%m-%d&quot;</span>,</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>                                             <span class="at">time_period =</span> <span class="st">&quot;year_quarter&quot;</span>,</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>                                             <span class="at">geography =</span> <span class="cn">NULL</span>)</span></code></pre></div>
+</div>
+<div id="plotting-time-trends" class="section level2">
+<h2>Plotting Time Trends</h2>
+<p>The <code>plot_timetrend()</code> function leverages
+<code>ggplot()</code> to produce a line graph of an indicator over
+time.</p>
+<p>Take the following example using the
+<code>cleaned_incident_data</code> where the count of assaults are
+plotted by quarter. The plot produced with <code>plot_timetrend()</code>
+is of class “ggplot” and can be easily modified as needed.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot_timetrend</span>(<span class="at">data =</span> cleaned_incident_data,</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>               <span class="at">y_var =</span> <span class="st">&quot;assault_count&quot;</span>,</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>               <span class="at">time_indicator =</span> <span class="st">&quot;year_quarter&quot;</span>,</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>               <span class="at">smoothing_method =</span> <span class="st">&quot;loess&quot;</span>,</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>               <span class="at">xlab =</span> <span class="st">&quot;Quarter&quot;</span>,</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>               <span class="at">ylab =</span> <span class="st">&quot;Assaults&quot;</span>)</span></code></pre></div>
+<p><img src="data:image/png;base64,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" style="display: block; margin: auto;" /></p>
+</div>
+<div id="getting-census-measures" class="section level2">
+<h2>Getting Census Measures</h2>
+<p>Analyzing crime incident data often requires census data, such as the
+population, racial composition, and socioeconomic condition of a
+geographic area. The <code>get_key_census_metric</code> produces a data
+frame of several census measures. The function allows the user to
+specify the time frame and the geographies for which census measures are
+to be extracted.</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Replace with user-specific API key</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="fu">Sys.setenv</span>(<span class="at">CENSUS_KEY=</span><span class="st">&#39;7c5c78e3abeb391dd9e2f432b6f74c8b949c0066&#39;</span>)</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>census_data <span class="ot">&lt;-</span> <span class="fu">get_key_census_metric</span>(<span class="at">geo_level =</span> <span class="st">&quot;tract&quot;</span>,</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>                                     <span class="at">state =</span> <span class="st">&quot;OH&quot;</span>,</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>                                     <span class="at">counties =</span> <span class="st">&quot;Franklin&quot;</span>,</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>                                     <span class="at">year =</span> <span class="dv">2020</span>,</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>                                     <span class="at">surv =</span> <span class="st">&quot;acs5&quot;</span>)</span></code></pre></div>
+<p>The data frame produced by <code>get_key_census_metric</code> is
+structured as follows. The first column contains the census code
+corresponding to the chosen geographic unit. The second column contains
+the name of the specific geographic unit. Subsequent columns contain
+various census metrics, starting with total population, followed by
+total households and household poverty.</p>
+<table>
+<colgroup>
+<col width="13%" />
+<col width="47%" />
+<col width="9%" />
+<col width="8%" />
+<col width="12%" />
+<col width="9%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="left">GEOID</th>
+<th align="left">NAME</th>
+<th align="right">tot_pop</th>
+<th align="right">tot_hh</th>
+<th align="right">hh_poverty</th>
+<th align="right">hh_snap</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">39049000110</td>
+<td align="left">Census Tract 1.10, Franklin County, Ohio</td>
+<td align="right">3489</td>
+<td align="right">1802</td>
+<td align="right">76</td>
+<td align="right">59</td>
+</tr>
+<tr class="even">
+<td align="left">39049000120</td>
+<td align="left">Census Tract 1.20, Franklin County, Ohio</td>
+<td align="right">3276</td>
+<td align="right">1659</td>
+<td align="right">53</td>
+<td align="right">0</td>
+</tr>
+<tr class="odd">
+<td align="left">39049000210</td>
+<td align="left">Census Tract 2.10, Franklin County, Ohio</td>
+<td align="right">3251</td>
+<td align="right">1540</td>
+<td align="right">92</td>
+<td align="right">7</td>
+</tr>
+<tr class="even">
+<td align="left">39049000220</td>
+<td align="left">Census Tract 2.20, Franklin County, Ohio</td>
+<td align="right">4013</td>
+<td align="right">1796</td>
+<td align="right">27</td>
+<td align="right">28</td>
+</tr>
+<tr class="odd">
+<td align="left">39049000310</td>
+<td align="left">Census Tract 3.10, Franklin County, Ohio</td>
+<td align="right">3156</td>
+<td align="right">1299</td>
+<td align="right">196</td>
+<td align="right">236</td>
+</tr>
+<tr class="even">
+<td align="left">39049000320</td>
+<td align="left">Census Tract 3.20, Franklin County, Ohio</td>
+<td align="right">2979</td>
+<td align="right">1179</td>
+<td align="right">159</td>
+<td align="right">255</td>
+</tr>
+<tr class="odd">
+<td align="left">39049000330</td>
+<td align="left">Census Tract 3.30, Franklin County, Ohio</td>
+<td align="right">2715</td>
+<td align="right">1028</td>
+<td align="right">327</td>
+<td align="right">340</td>
+</tr>
+<tr class="even">
+<td align="left">39049000410</td>
+<td align="left">Census Tract 4.10, Franklin County, Ohio</td>
+<td align="right">2378</td>
+<td align="right">1101</td>
+<td align="right">39</td>
+<td align="right">27</td>
+</tr>
+<tr class="odd">
+<td align="left">39049000420</td>
+<td align="left">Census Tract 4.20, Franklin County, Ohio</td>
+<td align="right">3577</td>
+<td align="right">1578</td>
+<td align="right">58</td>
+<td align="right">80</td>
+</tr>
+<tr class="even">
+<td align="left">39049000500</td>
+<td align="left">Census Tract 5, Franklin County, Ohio</td>
+<td align="right">4447</td>
+<td align="right">1985</td>
+<td align="right">214</td>
+<td align="right">90</td>
+</tr>
+</tbody>
+</table>
+</div>
+
+
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
