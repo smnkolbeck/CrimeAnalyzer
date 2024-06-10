@@ -144,7 +144,7 @@ census_data <- get_key_census_metric(geo_level = "tract",
 
 ```
 
-The data frame produced by `get_key_census_metric` is structured as follows. The first column contains the census code corresponding to the chosen geographic unit. The second column contains the name of the specific geographic unit. Subsequent columns contain various census metrics, starting with total population, followed by total households and household poverty.  
+The data frame produced by `get_key_census_metric` is structured as follows. The first column contains the census code corresponding to the chosen geographic unit. The second column contains the name of the specific geographic unit (i.e., block group, census tract, etc.). Subsequent columns contain various census metrics, such as total population, total households, and household poverty.  
 
 ```{r, echo= FALSE}
 knitr::kable(head(census_data[ ,1:6],10))
